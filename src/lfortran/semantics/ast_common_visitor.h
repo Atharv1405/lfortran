@@ -4973,6 +4973,17 @@ public:
                         type = ASRUtils::duplicate_type(al, type, &temp_dims);
                     }
                     init_expr = ASRUtils::EXPR(tmp);
+                    if (storage_type == ASR::storage_typeType::Parameter && init_expr) {
+                        if (!ASRUtils::is_value_constant(init_expr)) {
+                            diag.add(Diagnostic(
+                                "Initialization expression for PARAMETER must be a constant expression",
+                                Level::Error, Stage::Semantic, {
+                                    Label("not a constant expression",
+                                        {init_expr->base.loc})
+                                }));
+                            throw SemanticAbort();
+                        }
+                    }
                     value = ASRUtils::expr_value(init_expr);
                     // we do checks and correct length initialization for
                     // character (& character array) before creating repeated argument
